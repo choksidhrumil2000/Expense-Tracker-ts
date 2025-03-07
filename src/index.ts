@@ -3,7 +3,7 @@
 //Imports..................
 import * as readline from 'readline';
 import * as fs from 'fs';
-import { isCommandValid, isValueValid } from './helper';
+import { isCommandValid, isValueValid, makeTableOfExpenses } from './helper';
 import { COMMANDS, FLAGS_TRACK, FUNCTIONALITIES } from './constants';
 import { Expense } from './interfaces';
 
@@ -69,7 +69,7 @@ async function InitialSetup() {
         switch (args[0]) {
             case FUNCTIONALITIES.ADD:addExpense(args);break;
             case FUNCTIONALITIES.DELETE:deleteExpense(args);break;
-            case FUNCTIONALITIES.LIST:break;
+            case FUNCTIONALITIES.LIST:listExpenses();break;
             case FUNCTIONALITIES.SUMMARY:break;
             case FUNCTIONALITIES.UPDATE:break;
             case FUNCTIONALITIES.CLEAR:clearExpenses();break;
@@ -113,6 +113,7 @@ function showCommandsList():void {
 |==>summary - You can Summarise All the expense also can filter by month        |
 |           --> --month == You can filter by month                              |
 |-->example: summary --month <month>                                            |
+|-->example: summary                                            |
 |                                                                               |
 |==>clear - You can Clear all the expense data or reset all the Data            |
 |-->example: clear                                                              |  
@@ -136,8 +137,6 @@ function addExpense(args:string[]) {
         description:'',
         amount:0,
     }
-
-    // for(let i=1;i<args.length;i+=2){
         let i=1;
         switch(args[i]){
             case FLAGS_TRACK[FUNCTIONALITIES.ADD].DESCRIPTION:{
@@ -167,11 +166,11 @@ function addExpense(args:string[]) {
             case FLAGS_TRACK[FUNCTIONALITIES.ADD].AMOUNT:{
 
                 if(args[i+1]){
-                    if(isValueValid(args[i+1],FLAGS_TRACK[FUNCTIONALITIES.ADD].DESCRIPTION!)){
-                        obj.description = args[i+1];
+                    if(isValueValid(args[i+1],FLAGS_TRACK[FUNCTIONALITIES.ADD].AMOUNT!)){
+                        obj.amount = parseInt(args[i+1]);    
                         if(args[i+3]){
-                            if(isValueValid(args[i+3],FLAGS_TRACK[FUNCTIONALITIES.ADD].AMOUNT!)){
-                                obj.amount = parseInt(args[i+3]);    
+                            if(isValueValid(args[i+3],FLAGS_TRACK[FUNCTIONALITIES.ADD].DESCRIPTION!)){
+                                obj.description = args[i+3];
                             }else{
                                 return;
                             }
@@ -186,29 +185,11 @@ function addExpense(args:string[]) {
                     console.log("Amount Should Be Provided By User!!!");
                     return;
                 }
-
-                // if(args[i+1] && isValueValid(args[i+1],FLAGS_TRACK[FUNCTIONALITIES.ADD].AMOUNT!)){
-                //     obj.amount = parseInt(args[i+1]);
-                //     if(args[i+3]){
-                //         if(isValueValid(args[i+3],FLAGS_TRACK[FUNCTIONALITIES.ADD].DESCRIPTION!)){
-                //             obj.description = args[i+3];
-                //         }else{
-                //             return;
-                //         }
-                //     }else{
-                //         console.log("Description Should be Provided By User!!");
-                //         return;
-                //     } 
-                // }
-                // else{
-                //     return;
-                // }
                 break;
             }
 
             default:console.log("Flag is Not Valid!!");return;
         }
-    // }
 
     myExpenses.push(obj);
     try{
@@ -221,8 +202,20 @@ function addExpense(args:string[]) {
     }
 }
 
+//List All the Expenses..............................
+function listExpenses():void {
+    if(myExpenses.length === 0){
+        console.log("No Expenses !!!");
+        return;
+    }
+    const str = `----------------------------------------------------------------`;
+    console.log(str);
+    makeTableOfExpenses(myExpenses);
+    console.log(str);
+}
+
 //Delete a Particular Expense..........................................
-function deleteExpense(args:string[]) {
+function deleteExpense(args:string[]):void {
     const id:string = args[2];
     if(isValueValid(id,args[1])){
         const idx = giveIndex(parseInt(id));
@@ -247,11 +240,12 @@ function deleteExpense(args:string[]) {
 }
 
 //Clears All Expenses in file as well as Memory.........................
-function clearExpenses() {
+function clearExpenses():void {
     const oldExpenses:Expense[] = myExpenses;
     const temp:Expense[] = [];
+    myExpenses = temp;
     try{
-        writeDataInFile(temp);
+        writeDataInFile(myExpenses);
         console.log("Clear All Data SuccessFully!!!");
     }catch(e){
         //reversing the Action...............................
@@ -259,10 +253,6 @@ function clearExpenses() {
         myExpenses = oldExpenses;
     }
 }
-
-
-
-
 
 //gives Last ID......................................
 function getLastID(expenses:Expense[]) {

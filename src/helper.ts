@@ -1,6 +1,7 @@
 //==============================================Helper Functions ===========================================
 
 import { FUNCTIONALITIES, COMMANDS, FLAGS_TRACK, ALL_FLAGS } from './constants';
+import { Expense } from './interfaces';
 
 //Check if Command is valid or Not...........................
 function isCommandValid(args:string[]):boolean {
@@ -186,9 +187,18 @@ function isMonthValid(val:string){
     return false;
 }
 
+//makes Table of Expenses................
+function makeTableOfExpenses(expenses:Expense[]):void{
+    console.log('#ID\t Date\t \tDescription\t Amount');
+    expenses.forEach((item)=>{
+        console.log(`#${item.id}\t ${item.date}\t ${item.description}\t \t${item.amount}`);
+    });
+}
+
 
 
 export {
     isCommandValid,
-    isValueValid
+    isValueValid,
+    makeTableOfExpenses
 }
