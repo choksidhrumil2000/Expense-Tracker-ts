@@ -2,18 +2,39 @@
 
 //Imports..................
 import * as readline from 'readline';
-import { isCommandValid } from './helper';
+import * as fs from 'fs';
+import { isCommandValid, isValueTypeValid, isValueValid } from './helper';
+import { ALL_FLAGS, COMMANDS, FLAGS_TRACK, FUNCTIONALITIES } from './constants';
+import { Expense } from './interfaces';
 
 //GLOBAL VARIABLES................
+const PATH = './src/backend/myData.json';
 let args:string[] = [];
 let askAgain:boolean = true;
 
-// let myJsonData = [];
+let myExpenses:Expense[] = [];
 
 const rl:readline.Interface = readline.createInterface({
     input: process.stdin,
     output: process.stdout
 });
+
+//Initial Setup......................................
+InitialSetup();
+
+
+
+async function InitialSetup() {
+    if (fs.existsSync(PATH)) {
+        let data = await fs.readFileSync(PATH,'utf-8');
+        myExpenses = JSON.parse(data.toString());
+        // myExpenses.sort((a, b) => a.id - b.id);
+    } else {
+        await fs.writeFileSync(PATH, '[]');
+        myExpenses = [];
+    }
+}
+
 
 //Main Function Where Whole App Resides...................................................
 (async function main() {
@@ -32,18 +53,28 @@ const rl:readline.Interface = readline.createInterface({
     let isValid = isCommandValid(args);
     
     if (isValid) {
-        if (cmd !== 'exit') {
+        if (cmd !== COMMANDS.EXIT) {
             askAgain = true;
         } else {
             askAgain = false;
             rl.close()
             return;
         }
-    }
 
-    //For Help Command..................................
-    if (args[0] === 'help') {
-        showCommandsList();
+        //For Help Command..................................
+        if (args[0] === COMMANDS.HELP) {
+            showCommandsList();
+        }
+
+        switch (args[0]) {
+            case FUNCTIONALITIES.ADD:addExpense(args);break;
+            case FUNCTIONALITIES.DELETE:break;
+            case FUNCTIONALITIES.LIST:break;
+            case FUNCTIONALITIES.SUMMARY:break;
+            case FUNCTIONALITIES.UPDATE:break;
+            default:
+                break;
+        }
     }
    
     if (askAgain) main();
@@ -83,4 +114,80 @@ function showCommandsList():void {
 |-->example: clear                                                              |  
 ---------------------------------------------------------------------------------`;
     console.log(str);
+}
+
+//Add Expense...................................................................
+function addExpense(args:string[]) {
+    const today_date = new Date();
+    
+    const year = today_date.getFullYear();
+    const month = today_date.getMonth()+1;
+    const day = today_date.getDate();
+
+    const id = getLastID(myExpenses)+1;
+
+    const obj:Expense = {
+        id:id,
+        date:`${year}-${((month > 9) ? month:('0'+month))}-${((day > 9) ? day:('0'+day))}`,
+        description:'',
+        amount:0,
+    }
+
+    for(let i=1;i<args.length;i+=2){
+        switch(args[i]){
+            case FLAGS_TRACK[FUNCTIONALITIES.ADD].DESCRIPTION:{
+                
+                if(isValueValid(args[i+1],FLAGS_TRACK[FUNCTIONALITIES.ADD].DESCRIPTION!)){
+                    obj.description = args[i+1];
+                }else{
+                    return;
+                }
+                break;
+            }
+            case FLAGS_TRACK[FUNCTIONALITIES.ADD].AMOUNT:{
+                if(isValueValid(args[i+1],FLAGS_TRACK[FUNCTIONALITIES.ADD].AMOUNT!)){
+                    obj.amount = parseInt(args[i+1]);
+                }else{
+                    return;
+                }
+                break;
+            }
+
+            default:console.log("Flag is Not Valid!!");return;
+        }
+    }
+
+    myExpenses.push(obj);
+    try{
+        writeDataInFile(myExpenses);
+        console.log(`Expense Added Successfully!! (ID:${id})`);
+    }catch(e){
+        //reversing the Action...............................
+        console.log("Cannot Add Data in File!!");
+        myExpenses.pop();
+    }
+}
+
+
+
+
+
+//gives Last ID......................................
+function getLastID(expenses:Expense[]) {
+    let id = 0;
+    if(expenses.length !== 0){
+        id = expenses[expenses.length-1].id;
+    }
+    return id;
+}
+
+//Write a Data to File....................................
+async function writeDataInFile(jsonObj:Expense[]) {
+    let data = JSON.stringify(jsonObj);
+    await fs.writeFileSync(PATH, data);
+}
+
+//gives Index of Particular Expense.....................................
+function giveIndex(id:number) {
+    return myExpenses.findIndex((item)=>item.id === id);
 }

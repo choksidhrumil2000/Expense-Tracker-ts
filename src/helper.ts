@@ -1,39 +1,48 @@
 //==============================================Helper Functions ===========================================
 
-import { FUNCTIONALITIES, COMMANDS } from './constants';
+import { FUNCTIONALITIES, COMMANDS, FLAGS_TRACK, ALL_FLAGS } from './constants';
 
 //Check if Command is valid or Not...........................
 function isCommandValid(args:string[]):boolean {
-    // if (cmd === "") {
-    //     console.log("****** Please Write Command!! or write 'help' *******");
-    //     return true;
-    // }
+
     if (args[0] === "") {
         console.log("****** Please Write Command!! or write 'help' *******");
         return true;
     }
-    // let args = cmd.split(" ");
 
     for (let i = 0; i < args.length; i++) {
         if (i === 2) break;
         args[i] = args[i].toLowerCase();
     }
 
-    if (args[0] !== "" && !COMMANDS.includes(args[0]) && !FUNCTIONALITIES.includes(args[0])) {
+    const functionalities_arr = Object.values(FUNCTIONALITIES);
+    const commands_arr = Object.values(COMMANDS);
+    let flags_arr = fetchUserFlags(args);
+
+    if (args[0] !== "" && !commands_arr.includes(args[0]) && !functionalities_arr.includes(args[0])) {
         console.log("ERROR: invalid Command!!");
         return false;
-    }else if(FUNCTIONALITIES.includes(args[0])){
-        let flags = fetchFlags(args);
-        if(flags.length === 0 && args[0] !== 'list'){
+    }else if(functionalities_arr.includes(args[0])){
+        
+        if(flags_arr.length === 0 && args[0] !== FUNCTIONALITIES.LIST){
             console.log("ERROR: flags are mandatory.");
+            return false;
+        }
+        let isSequenceValid = writtenCmdSequenceValidOrNot(args);
+        if(!isSequenceValid){
+            console.log("Something's Wrong with the flag Sequence!!");
+            return false;
+        }
+        if(isSequenceValid && !areFlagsValid(flags_arr,args[0])){
+            console.log("Something is wrong with flags kindly check or take help of 'help' commmand!!");
             return false;
         }
     }
     return true;
 }
 
-//Fetching Flags from args.....................................
-function fetchFlags(args:string[]): string[] {
+//Fetching Flags which user has given in command.....................................
+function fetchUserFlags(args:string[]): string[] {
     let flags:string[] = [];
 
     args.forEach((item)=>{
@@ -45,7 +54,133 @@ function fetchFlags(args:string[]): string[] {
     return flags;
 }
 
+//checks if flag Sequence is Valid or not.....................................
+function writtenCmdSequenceValidOrNot(args:string[]):boolean {
+    for(let i=1;i<args.length;i+=2){
+        if(!args[i].startsWith('--') ){
+            return false;
+        }
+    }    
+    return true;
+}
+
+//check Flags are Valid or not ...........................
+function areFlagsValid(user_flags_arr:string[],func:string):boolean {
+
+    const inbuilt_flags_arr = Object.values(FLAGS_TRACK[func]);
+
+    if(user_flags_arr.length < inbuilt_flags_arr.length){
+        return false;
+    }
+    for(let i=0;i<user_flags_arr.length;i++){
+        if(!inbuilt_flags_arr.includes(user_flags_arr[i]))return false;
+    }
+
+    return true;
+}
+
+//Check If Provided ValueType is Valid or Not.........................................
+function isValueTypeValid(val:string,flag:string):boolean{
+    switch(flag){
+        case ALL_FLAGS.DESCRIPTION:{
+            if(isNaN(parseInt(val))){
+                return true;
+            }else{
+                console.log("ERROR: Description Should be text or alphanumeric")
+                return false;
+            }
+        }
+        case ALL_FLAGS.AMOUNT:{
+            if(isNaN(parseInt(val))){
+                console.log("ERROR: Amount Should be Number!!");
+                return false;
+            }else{
+                return true;
+            }
+        }
+        case ALL_FLAGS.ID:{
+            if(isNaN(parseInt(val))){
+                console.log("ERROR: Id Should be Number!!");
+                return false;
+            }else{
+                return true;
+            }
+        }
+        case ALL_FLAGS.MONTH:{
+            if(isNaN(parseInt(val))){
+                console.log("ERROR: Month SHould be Number!!");
+                return false;
+            }else{
+                return true;
+            }
+        }
+        default:{
+            console.log("Flag is Not Valid!!!");
+            return false;
+        }
+    }
+}
+
+//Check If Provided ValueType is Valid or Not.........................................
+function isValueValid(val:string,flag:string):boolean{
+
+    if(isValueTypeValid(val,flag)){
+        switch(flag){
+            case ALL_FLAGS.DESCRIPTION:{
+                return true;
+            }
+            case ALL_FLAGS.AMOUNT:{
+                return isAmountValid(parseInt(val));
+            }
+            case ALL_FLAGS.ID:{
+                return true;
+            }
+            case ALL_FLAGS.MONTH:{
+                return true;
+            }
+            default:{
+                console.log("Flag is Not Valid!!!");
+                return false;
+            }
+        }    
+    }else{
+        console.log(`ERROR: Value Type of ${flag} is not Valid!!`);
+        return false;
+    }
+    
+}
+
+//checks if Description's value is Valid or not....................................
+function isDescriptionValid(val:string){
+    //Maybe In Future Use.....
+}
+
+//checks if Amount's value is Valid or not....................................
+function isAmountValid(val:number){
+    //In Additional Feature: Budget Setting : We will check if Amount is Valid or Not
+    return true;
+}
+
+//checks if ID's value is Valid or not....................................
+// function isIdValid(val:string){
+//     // Maybe In Future Use..........................
+//     
+// }
+
+//checks if ID's value is Valid or not....................................
+function isMonthValid(val:string){
+    const month = parseInt(val);
+    if(typeof month === 'number' && month >=1 && month <=12){
+        console.log("Given Month is NOt Valid!! Try Again!!");
+        return true;
+    }
+    return false;
+}
+
+
 
 export {
-    isCommandValid
+    isCommandValid,
+    isValueTypeValid,
+    isValueValid
 }
