@@ -5,10 +5,6 @@ interface Expense{
     'amount':number,
 }
 
-interface FlagsWithFunc{
-    
-}
-
 export{
     Expense,
 }
