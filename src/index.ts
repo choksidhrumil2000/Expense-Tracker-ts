@@ -4,7 +4,7 @@
 import * as readline from 'readline';
 import * as fs from 'fs';
 import { isCommandValid, isValueValid } from './helper';
-import { ALL_FLAGS, COMMANDS, FLAGS_TRACK, FUNCTIONALITIES } from './constants';
+import { COMMANDS, FLAGS_TRACK, FUNCTIONALITIES } from './constants';
 import { Expense } from './interfaces';
 
 //GLOBAL VARIABLES................
@@ -68,7 +68,7 @@ async function InitialSetup() {
 
         switch (args[0]) {
             case FUNCTIONALITIES.ADD:addExpense(args);break;
-            case FUNCTIONALITIES.DELETE:break;
+            case FUNCTIONALITIES.DELETE:deleteExpense(args);break;
             case FUNCTIONALITIES.LIST:break;
             case FUNCTIONALITIES.SUMMARY:break;
             case FUNCTIONALITIES.UPDATE:break;
@@ -137,29 +137,78 @@ function addExpense(args:string[]) {
         amount:0,
     }
 
-    for(let i=1;i<args.length;i+=2){
+    // for(let i=1;i<args.length;i+=2){
+        let i=1;
         switch(args[i]){
             case FLAGS_TRACK[FUNCTIONALITIES.ADD].DESCRIPTION:{
                 
-                if(isValueValid(args[i+1],FLAGS_TRACK[FUNCTIONALITIES.ADD].DESCRIPTION!)){
-                    obj.description = args[i+1];
+                if(args[i+1]){
+                    if(isValueValid(args[i+1],FLAGS_TRACK[FUNCTIONALITIES.ADD].DESCRIPTION!)){
+                        obj.description = args[i+1];
+                        if(args[i+3]){
+                            if(isValueValid(args[i+3],FLAGS_TRACK[FUNCTIONALITIES.ADD].AMOUNT!)){
+                                obj.amount = parseInt(args[i+3]);    
+                            }else{
+                                return;
+                            }
+                        }else{
+                            console.log("Amount Should be Provided By User!!");
+                            return;
+                        }   
+                    }else{
+                        return;
+                    }
                 }else{
+                    console.log("Descripiton Should Be Provided By User!!!");
                     return;
                 }
                 break;
             }
             case FLAGS_TRACK[FUNCTIONALITIES.ADD].AMOUNT:{
-                if(isValueValid(args[i+1],FLAGS_TRACK[FUNCTIONALITIES.ADD].AMOUNT!)){
-                    obj.amount = parseInt(args[i+1]);
+
+                if(args[i+1]){
+                    if(isValueValid(args[i+1],FLAGS_TRACK[FUNCTIONALITIES.ADD].DESCRIPTION!)){
+                        obj.description = args[i+1];
+                        if(args[i+3]){
+                            if(isValueValid(args[i+3],FLAGS_TRACK[FUNCTIONALITIES.ADD].AMOUNT!)){
+                                obj.amount = parseInt(args[i+3]);    
+                            }else{
+                                return;
+                            }
+                        }else{
+                            console.log("Description Should be Provided By User!!");
+                            return;
+                        }   
+                    }else{
+                        return;
+                    }
                 }else{
+                    console.log("Amount Should Be Provided By User!!!");
                     return;
                 }
+
+                // if(args[i+1] && isValueValid(args[i+1],FLAGS_TRACK[FUNCTIONALITIES.ADD].AMOUNT!)){
+                //     obj.amount = parseInt(args[i+1]);
+                //     if(args[i+3]){
+                //         if(isValueValid(args[i+3],FLAGS_TRACK[FUNCTIONALITIES.ADD].DESCRIPTION!)){
+                //             obj.description = args[i+3];
+                //         }else{
+                //             return;
+                //         }
+                //     }else{
+                //         console.log("Description Should be Provided By User!!");
+                //         return;
+                //     } 
+                // }
+                // else{
+                //     return;
+                // }
                 break;
             }
 
             default:console.log("Flag is Not Valid!!");return;
         }
-    }
+    // }
 
     myExpenses.push(obj);
     try{
@@ -169,6 +218,31 @@ function addExpense(args:string[]) {
         //reversing the Action...............................
         console.log("Cannot Add Data in File!!");
         myExpenses.pop();
+    }
+}
+
+//Delete a Particular Expense..........................................
+function deleteExpense(args:string[]) {
+    const id:string = args[2];
+    if(isValueValid(id,args[1])){
+        const idx = giveIndex(parseInt(id));
+        if(idx === -1){
+            console.log("Expense Not Found!!");
+            return;
+        }
+
+        const oldExpense:Expense = myExpenses.slice(idx,idx+1)[0];
+        myExpenses.splice(idx,1);
+        try{
+            writeDataInFile(myExpenses);
+            console.log("Expense Deleted Successfully!!");
+        }catch(e){
+            //reversing the Action...............................
+            console.log("Cannot Add Data in File!!");
+            myExpenses.push(oldExpense); 
+            myExpenses.sort((a,b)=>a.id-b.id);
+        }
+
     }
 }
 

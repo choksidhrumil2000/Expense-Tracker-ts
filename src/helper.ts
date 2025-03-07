@@ -30,7 +30,7 @@ function isCommandValid(args:string[]):boolean {
         }
         let isSequenceValid = writtenCmdSequenceValidOrNot(args);
         if(!isSequenceValid){
-            console.log("Something's Wrong with the flag Sequence!!");
+            console.log("Something's Wrong with the command Kindly check or take help using help command!!");
             return false;
         }
         if(isSequenceValid && !areFlagsValid(flags_arr,args[0])){
@@ -127,12 +127,14 @@ function isValueValid(val:string,flag:string):boolean{
     if(isValueTypeValid(val,flag)){
         switch(flag){
             case ALL_FLAGS.DESCRIPTION:{
+                return isDescriptionValid(val);
                 return true;
             }
             case ALL_FLAGS.AMOUNT:{
                 return isAmountValid(parseInt(val));
             }
             case ALL_FLAGS.ID:{
+                // return isIdValid(val);
                 return true;
             }
             case ALL_FLAGS.MONTH:{
@@ -152,7 +154,14 @@ function isValueValid(val:string,flag:string):boolean{
 
 //checks if Description's value is Valid or not....................................
 function isDescriptionValid(val:string){
-    //Maybe In Future Use.....
+    const in_built_flags = Object.values(ALL_FLAGS);
+
+    if(in_built_flags.includes(val) || val.startsWith('-')){
+        console.log("description is Not Valid!!");
+        return false;
+    }else{
+        return true;
+    }
 }
 
 //checks if Amount's value is Valid or not....................................
