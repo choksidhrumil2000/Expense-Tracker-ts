@@ -25,7 +25,11 @@ function isCommandValid(args:string[]):boolean {
         return false;
     }else if(functionalities_arr.includes(args[0])){
         
-        if(flags_arr.length === 0 && args[0] !== FUNCTIONALITIES.LIST && args[0] !== FUNCTIONALITIES.CLEAR){
+        // if(flags_arr.length === 0 && args[0] !== FUNCTIONALITIES.LIST && args[0] !== FUNCTIONALITIES.CLEAR){
+        //     console.log("ERROR: flags are mandatory.");
+        //     return false;
+        // }
+        if(flags_arr.length === 0 && args[0] === FUNCTIONALITIES.ADD){
             console.log("ERROR: flags are mandatory.");
             return false;
         }
@@ -70,11 +74,14 @@ function areFlagsValid(user_flags_arr:string[],func:string):boolean {
 
     const inbuilt_flags_arr = Object.values(FLAGS_TRACK[func]);
 
-    if(user_flags_arr.length < inbuilt_flags_arr.length){
+    if(func === FUNCTIONALITIES.ADD && user_flags_arr.length < inbuilt_flags_arr.length){
+        return false;
+    }else if(user_flags_arr > inbuilt_flags_arr){
         return false;
     }
     for(let i=0;i<user_flags_arr.length;i++){
         if(!inbuilt_flags_arr.includes(user_flags_arr[i]))return false;
+        // else if()
     }
 
     return true;
@@ -129,7 +136,6 @@ function isValueValid(val:string,flag:string):boolean{
         switch(flag){
             case ALL_FLAGS.DESCRIPTION:{
                 return isDescriptionValid(val);
-                return true;
             }
             case ALL_FLAGS.AMOUNT:{
                 return isAmountValid(parseInt(val));
@@ -139,7 +145,7 @@ function isValueValid(val:string,flag:string):boolean{
                 return true;
             }
             case ALL_FLAGS.MONTH:{
-                return true;
+                return isMonthValid(val);
             }
             default:{
                 console.log("Flag is Not Valid!!!");
@@ -180,11 +186,11 @@ function isAmountValid(val:number){
 //checks if ID's value is Valid or not....................................
 function isMonthValid(val:string){
     const month = parseInt(val);
-    if(typeof month === 'number' && month >=1 && month <=12){
+    if(!(month >=1 && month <=12)){
         console.log("Given Month is NOt Valid!! Try Again!!");
-        return true;
+        return false;
     }
-    return false;
+    return true;
 }
 
 //makes Table of Expenses................

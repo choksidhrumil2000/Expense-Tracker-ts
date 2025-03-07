@@ -4,7 +4,7 @@
 import * as readline from 'readline';
 import * as fs from 'fs';
 import { isCommandValid, isValueValid, makeTableOfExpenses } from './helper';
-import { COMMANDS, FLAGS_TRACK, FUNCTIONALITIES } from './constants';
+import { COMMANDS, FLAGS_TRACK, FUNCTIONALITIES, MONTH } from './constants';
 import { Expense } from './interfaces';
 
 //GLOBAL VARIABLES................
@@ -70,7 +70,7 @@ async function InitialSetup() {
             case FUNCTIONALITIES.ADD:addExpense(args);break;
             case FUNCTIONALITIES.DELETE:deleteExpense(args);break;
             case FUNCTIONALITIES.LIST:listExpenses();break;
-            case FUNCTIONALITIES.SUMMARY:break;
+            case FUNCTIONALITIES.SUMMARY:summariseExpenses(args);break;
             case FUNCTIONALITIES.UPDATE:break;
             case FUNCTIONALITIES.CLEAR:clearExpenses();break;
             default:
@@ -237,6 +237,28 @@ function deleteExpense(args:string[]):void {
         }
 
     }
+}
+
+//Summarise Expenses..................................................
+function summariseExpenses(args:string[]):void {
+    let total_Expense = 0;
+    if(args[1]){
+        if(isValueValid(args[2],FLAGS_TRACK[FUNCTIONALITIES.SUMMARY].MONTH!)){
+            const month = parseInt(args[2]);
+            const filtered_expenses = myExpenses.filter((item)=>{
+                const curr_month = parseInt(item.date.split('-')[1]);
+                return curr_month === month;
+            });
+            total_Expense = filtered_expenses.reduce((acc,item)=>acc+item.amount,0);
+            console.log(`Total Expenses of month ${MONTH[month-1]} is : ${total_Expense}`);
+        }else{
+            return;
+        }
+    }else{
+        total_Expense = myExpenses.reduce((acc,item)=>acc+item.amount,0);
+        console.log(`Total Expenses: ${total_Expense}`);
+    }
+
 }
 
 //Clears All Expenses in file as well as Memory.........................

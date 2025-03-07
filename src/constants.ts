@@ -47,9 +47,40 @@ const COMMANDS = {
     "HELP":"help",
 };
 
+// enum MONTH {
+//     JANUARY,
+//     FEBRUARY,
+//     MARCH,
+//     APRIL,
+//     MAY,
+//     JUNE,
+//     JULY,
+//     AUGUST,
+//     SEPTEMBER,
+//     OCTOBER,
+//     NOVEMBER,
+//     DECEMBER
+// };
+
+const MONTH:string[]=[
+    "JANUARY",
+    "FEBRUARY",
+    "MARCH",
+    "APRIL",
+    "MAY",
+    "JUNE",
+    "JULY",
+    "AUGUST",
+    "SEPTEMBER",
+    "OCTOBER",
+    "NOVEMBER",
+    "DECEMBER"
+];
+
 export{
     FUNCTIONALITIES,
     FLAGS_TRACK,
     COMMANDS,
-    ALL_FLAGS
+    ALL_FLAGS,
+    MONTH
 }
