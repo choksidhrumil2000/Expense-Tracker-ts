@@ -5,6 +5,7 @@ const FUNCTIONALITIES = {
     "DELETE":"delete",
     "LIST":"list",
     "SUMMARY":"summary",
+    "CLEAR":"clear"
 };
 
 //All the Flags of Expense Tracker CLI APP....................................
@@ -31,6 +32,12 @@ const FLAGS_TRACK = {
     },
     [FUNCTIONALITIES.DELETE]:{
         "ID":ALL_FLAGS.ID,
+    },
+    [FUNCTIONALITIES.LIST]:{
+        
+    },
+    [FUNCTIONALITIES.CLEAR]:{
+        
     }
 };
 

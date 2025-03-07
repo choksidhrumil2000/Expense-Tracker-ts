@@ -3,7 +3,7 @@
 //Imports..................
 import * as readline from 'readline';
 import * as fs from 'fs';
-import { isCommandValid, isValueTypeValid, isValueValid } from './helper';
+import { isCommandValid, isValueValid } from './helper';
 import { ALL_FLAGS, COMMANDS, FLAGS_TRACK, FUNCTIONALITIES } from './constants';
 import { Expense } from './interfaces';
 
@@ -72,6 +72,7 @@ async function InitialSetup() {
             case FUNCTIONALITIES.LIST:break;
             case FUNCTIONALITIES.SUMMARY:break;
             case FUNCTIONALITIES.UPDATE:break;
+            case FUNCTIONALITIES.CLEAR:clearExpenses();break;
             default:
                 break;
         }
@@ -105,6 +106,9 @@ function showCommandsList():void {
 |                                                                               | 
 |==>list - You can List All the expenses                                        |
 |-->example: list                                                               |
+|                                                                               |
+|==>clear - You can Clear All the expenses                                      |
+|-->example: clear                                                              |
 |                                                                               |
 |==>summary - You can Summarise All the expense also can filter by month        |
 |           --> --month == You can filter by month                              |
@@ -165,6 +169,20 @@ function addExpense(args:string[]) {
         //reversing the Action...............................
         console.log("Cannot Add Data in File!!");
         myExpenses.pop();
+    }
+}
+
+//Clears All Expenses in file as well as Memory.........................
+function clearExpenses() {
+    const oldExpenses:Expense[] = myExpenses;
+    const temp:Expense[] = [];
+    try{
+        writeDataInFile(temp);
+        console.log("Clear All Data SuccessFully!!!");
+    }catch(e){
+        //reversing the Action...............................
+        console.log("Cannot Add Data in File!!");
+        myExpenses = oldExpenses;
     }
 }
 

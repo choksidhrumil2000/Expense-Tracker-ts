@@ -24,7 +24,7 @@ function isCommandValid(args:string[]):boolean {
         return false;
     }else if(functionalities_arr.includes(args[0])){
         
-        if(flags_arr.length === 0 && args[0] !== FUNCTIONALITIES.LIST){
+        if(flags_arr.length === 0 && args[0] !== FUNCTIONALITIES.LIST && args[0] !== FUNCTIONALITIES.CLEAR){
             console.log("ERROR: flags are mandatory.");
             return false;
         }
@@ -121,7 +121,7 @@ function isValueTypeValid(val:string,flag:string):boolean{
     }
 }
 
-//Check If Provided ValueType is Valid or Not.........................................
+//Check If Provided Value is Valid or Not.........................................
 function isValueValid(val:string,flag:string):boolean{
 
     if(isValueTypeValid(val,flag)){
@@ -181,6 +181,5 @@ function isMonthValid(val:string){
 
 export {
     isCommandValid,
-    isValueTypeValid,
     isValueValid
 }
