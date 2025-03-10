@@ -329,9 +329,9 @@ function getLastID(expenses:Expense[]) {
 }
 
 //Write a Data to File....................................
-async function writeDataInFile(jsonObj:Expense[]) {
+function writeDataInFile(jsonObj:Expense[]) {
     let data = JSON.stringify(jsonObj);
-    await fs.writeFileSync(PATH, data);
+    fs.writeFileSync(PATH, data);
 }
 
 //gives Index of Particular Expense.....................................

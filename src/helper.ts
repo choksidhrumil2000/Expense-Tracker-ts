@@ -105,8 +105,7 @@ function writtenCmdSequenceValidOrNot(args:string[]):boolean {
             if(args[i].startsWith('--')){
                 return false;
             }
-        }
-        
+        }     
     }    
     return true;
 }
